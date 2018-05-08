@@ -10,6 +10,8 @@ mongoose.connect("mongodb://localhost:27017/tribe");
 //Initializes the express application, this must be done before
 //applying any middleware to the app.
 let app = express();
+app.use(body.urlencoded());
+app.use(body.json());
 
 //Here we are going to set up our REST api for PUT and GET requests to
 //the tribe backend database.
@@ -61,6 +63,13 @@ app.get('/tribe/creator/:creator',function(req,res){
   });
 });
 
+app.post('/tribe/add',function(req,res){
+  //Grab all the info passed in through the post form.
+  let post_date = req.body;
+
+
+});
+
 //USER FUNCTIONS HERE
 app.get('/user/:name',function(req,res){
   TribeUsers.getUserByName(req.params.name,function(err,users){
@@ -71,6 +80,8 @@ app.get('/user/:name',function(req,res){
     }
   });
 });
+
+
 
 //Start the application on the given port.
 app.listen(4000);

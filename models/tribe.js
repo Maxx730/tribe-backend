@@ -12,6 +12,14 @@ let tribe_schema = mongoose.Schema({
   creator:{
     type:String,
     required:true
+  },
+  events:{
+    type: Array,
+    default: []
+  },
+  members:{
+    type: Array,
+    default:[]
   }
 },{collection:"tribes"});
 
@@ -28,4 +36,9 @@ module.exports.getTribeByName = function(name,callback){
 
 module.exports.getTribesByCreator = function(creator,callback){
   Tribes.find({creator:creator},callback);
+}
+
+//ADDITION FUNCTIONS BELOW.
+module.exports.addTribe = function(name,creator,description,callback){
+  Tribes.create({title:name,creator:creator,description:description,events:[],members:[]},callback);
 }
