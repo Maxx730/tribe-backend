@@ -21,3 +21,7 @@ let TribeUsers = module.exports = mongoose.model('TribeUser',user_schema);
 module.exports.getUsers = function(callback,limit){
   TribeUsers.find(callback).limit(limit);
 }
+
+module.exports.getUserByName = function(name,callback){
+  TribeUsers.find({username:name},callback);
+}

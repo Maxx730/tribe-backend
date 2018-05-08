@@ -21,3 +21,11 @@ let Tribes = module.exports = mongoose.model('Tribes',tribe_schema);
 module.exports.getTribes = function(callback,limit){
   Tribes.find(callback).limit(limit);
 }
+
+module.exports.getTribeByName = function(name,callback){
+  Tribes.find({title:name},callback);
+}
+
+module.exports.getTribesByCreator = function(creator,callback){
+  Tribes.find({creator:creator},callback);
+}

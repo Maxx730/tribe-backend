@@ -42,14 +42,35 @@ app.get('/tribes',function(req,res){
 
 //TRIBE FUNCTIONS HERE
 app.get('/tribe/:name',function(req,res){
-
+  Tribes.getTribeByName(req.params.name,function(err,tribes){
+    if(err){
+      throw err;
+    }else{
+      res.json(tribes);
+    }
+  });
 });
 
-app.get('/tribe/:creator',function(req,res){
-
+app.get('/tribe/creator/:creator',function(req,res){
+  Tribes.getTribesByCreator(req.params.creator,function(err,tribes){
+    if(err){
+      throw err;
+    }else{
+      res.json(tribes);
+    }
+  });
 });
 
 //USER FUNCTIONS HERE
+app.get('/user/:name',function(req,res){
+  TribeUsers.getUserByName(req.params.name,function(err,users){
+    if(err){
+      throw err;
+    }else{
+      res.json(users);
+    }
+  });
+});
 
 //Start the application on the given port.
 app.listen(4000);
