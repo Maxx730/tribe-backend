@@ -67,7 +67,22 @@ app.post('/tribe/add',function(req,res){
   //Grab all the info passed in through the post form.
   let post_date = req.body;
 
-
+  //First check if the database already has a tribe with the name
+  Tribes.getTribeByName(req.body.title,function(err,tribe){
+    if(err){
+      throw err;
+    }else{
+      //Check if tribe is not empty, if not then the tribe with the new title already exists.
+      if(tribe.length > 0){
+        console.log("we have found a tribe with said name.");
+      }else{
+        console.log("we have NOT found a tribe with said name.");
+      }
+    }
+  });
+  //After we have hit the post request we want to verify the information coming in and
+  //pass it along to the mongo database schema object.
+  //Tribes.addTribe(req.body);
 });
 
 //USER FUNCTIONS HERE

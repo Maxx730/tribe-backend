@@ -39,6 +39,6 @@ module.exports.getTribesByCreator = function(creator,callback){
 }
 
 //ADDITION FUNCTIONS BELOW.
-module.exports.addTribe = function(name,creator,description,callback){
-  Tribes.create({title:name,creator:creator,description:description,events:[],members:[]},callback);
+module.exports.addTribe = function(data,callback){
+  Tribes.create(data,callback);
 }
