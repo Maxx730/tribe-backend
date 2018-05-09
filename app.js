@@ -4,6 +4,10 @@ let express = require('express');
 let body = require('body-parser');
 let TribeUsers = require("./models/user");
 let Tribes = require("./models/tribe");
+
+//ERROR CODES
+EMAIL_EXISTS = 237;
+
 //Connect to Mongoose
 mongoose.connect("mongodb://localhost:27017/tribe");
 
@@ -12,10 +16,6 @@ mongoose.connect("mongodb://localhost:27017/tribe");
 let app = express();
 app.use(body.urlencoded());
 app.use(body.json());
-
-//Here we are going to set up our REST api for PUT and GET requests to
-//the tribe backend database.
-//GET Request first here, POST will come later when adding things to the database.
 
 //First two functions are very simple, they are going to simply just spit out all
 //of the users (for now) and tribes mostly for building purposes within our backend.
@@ -39,10 +39,8 @@ app.get('/tribes',function(req,res){
   });
 });
 
-//Here we are going to start having more specific requests such as, get tribes by username
-//id, creator etc.
-
 //TRIBE FUNCTIONS HERE
+//GET TRIBE BY NAME
 app.get('/tribe/:name',function(req,res){
   Tribes.getTribeByName(req.params.name,function(err,tribes){
     if(err){
@@ -52,7 +50,7 @@ app.get('/tribe/:name',function(req,res){
     }
   });
 });
-
+//GET TRIBES BY CREATOR
 app.get('/tribe/creator/:creator',function(req,res){
   Tribes.getTribesByCreator(req.params.creator,function(err,tribes){
     if(err){
@@ -62,7 +60,7 @@ app.get('/tribe/creator/:creator',function(req,res){
     }
   });
 });
-
+//ADD TRIBE TO DATABASE.
 app.post('/tribe/add',function(req,res){
   //Grab all the info passed in through the post form.
   let post_date = req.body;
@@ -86,6 +84,7 @@ app.post('/tribe/add',function(req,res){
 });
 
 //USER FUNCTIONS HERE
+//GET USER BY USERNAME
 app.get('/user/:name',function(req,res){
   TribeUsers.getUserByName(req.params.name,function(err,users){
     if(err){
@@ -95,8 +94,23 @@ app.get('/user/:name',function(req,res){
     }
   });
 });
+//ADDS NEW USER TO THE DATABASE I.E SIGNUP
+app.post('/user/new',function(req,res){
+  let post_date = req.body;
 
-
+  //CHECK IF THE NEW USER EMAIL ALREADY EXISTS WITHIN THE DATABASE.
+  TribeUsers.checkUserEmail(req.body.email,function(err,res){
+    if(err){
+      throw err;
+    }else{
+      if(res.length > 0){
+        //THROW AN ERROR CODE BASED ON WHAT WAS WRONG, I.E. THE EMAIL ALREADY EXISTS.
+      }else{
+        console.log("adding new user to database");
+      }
+    }
+  });
+});
 
 //Start the application on the given port.
 app.listen(4000);

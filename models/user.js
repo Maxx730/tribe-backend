@@ -12,6 +12,14 @@ let user_schema = mongoose.Schema({
   password:{
     type: String,
     required:true
+  },
+  email:{
+    type: String,
+    required:true
+  },
+  signup:{
+    type: Date,
+    default: Date.now
   }
 },{collection:'users'});
 
@@ -21,7 +29,11 @@ let TribeUsers = module.exports = mongoose.model('TribeUser',user_schema);
 module.exports.getUsers = function(callback,limit){
   TribeUsers.find(callback).limit(limit);
 }
-
+//RETURNS A USER OBJECT(JSON) BASED ON A GIVEN USERNAME
 module.exports.getUserByName = function(name,callback){
   TribeUsers.find({username:name},callback);
+}
+//CHECKS IF THE GIVEN EMAIL ALREADY EXISTS IN THE SYSTEM FOR ANOTHER USER.
+module.exports.checkUserEmail = function(email,callback){
+  TribeUsers.find({email:email},callback);
 }
