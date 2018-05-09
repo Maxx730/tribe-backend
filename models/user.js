@@ -17,6 +17,12 @@ let user_schema = mongoose.Schema({
     type: String,
     required:true
   },
+  firstName:{
+    type: String
+  },
+  lastName:{
+    type: String
+  },
   signup:{
     type: Date,
     default: Date.now
@@ -36,4 +42,8 @@ module.exports.getUserByName = function(name,callback){
 //CHECKS IF THE GIVEN EMAIL ALREADY EXISTS IN THE SYSTEM FOR ANOTHER USER.
 module.exports.checkUserEmail = function(email,callback){
   TribeUsers.find({email:email},callback);
+}
+//IF THE CHECK PASSES THEN
+module.exports.addNewUser = function(user,callback){
+  TribeUsers.create(user,callback);
 }

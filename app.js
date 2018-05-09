@@ -8,6 +8,9 @@ let Tribes = require("./models/tribe");
 //ERROR CODES
 EMAIL_EXISTS = 237;
 
+//SUCCESS_CODES
+USER_CREATED = 337;
+
 //Connect to Mongoose
 mongoose.connect("mongodb://localhost:27017/tribe");
 
@@ -99,14 +102,28 @@ app.post('/user/new',function(req,res){
   let post_date = req.body;
 
   //CHECK IF THE NEW USER EMAIL ALREADY EXISTS WITHIN THE DATABASE.
-  TribeUsers.checkUserEmail(req.body.email,function(err,res){
+  TribeUsers.checkUserEmail(req.body.email,function(err,resu){
+    res.setHeader('Content-Type','application/json');
     if(err){
       throw err;
+      res.end();
     }else{
-      if(res.length > 0){
+      if(resu.length > 0){
         //THROW AN ERROR CODE BASED ON WHAT WAS WRONG, I.E. THE EMAIL ALREADY EXISTS.
+        //MOBILE APPLICATION WILL READ THIS ERROR CODE TO DETERMINE WHAT WHEN WRONG.
+        res.json({error:{type:"EMAIL_EXISTS"}});
+        res.end();
       }else{
-        console.log("adding new user to database");
+        //HERE WE ACTUALLY WANT TO ADD ANOTHER USER TO THE DATABASE.
+        TribeUsers.addNewUser(req.body,function(err,result){
+          if(err){
+            throw err;
+            res.end();
+          }else{
+            res.json({type:"USER_CREATED"});
+            res.end();
+          }
+        })
       }
     }
   });
