@@ -42,3 +42,7 @@ module.exports.getTribesByCreator = function(creator,callback){
 module.exports.addTribe = function(data,callback){
   Tribes.create(data,callback);
 }
+
+module.exports.addUserToTribe = function(tribeId,userId,callback){
+  
+}

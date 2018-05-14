@@ -17,11 +17,13 @@ mongoose.connect("mongodb://localhost:27017/tribe");
 //Initializes the express application, this must be done before
 //applying any middleware to the app.
 let app = express();
-app.use(body.urlencoded());
+app.use(body.urlencoded({extended:true}));
 app.use(body.json());
 
 //First two functions are very simple, they are going to simply just spit out all
 //of the users (for now) and tribes mostly for building purposes within our backend.
+
+//GET ALL USERS
 app.get('/users',function(req,res){
   TribeUsers.getUsers(function(err,users){
     if(err){
@@ -32,6 +34,7 @@ app.get('/users',function(req,res){
   });
 });
 
+//GET ALL TRIBES
 app.get('/tribes',function(req,res){
   Tribes.getTribes(function(err,tribes){
     if(err){
@@ -53,6 +56,7 @@ app.get('/tribe/:name',function(req,res){
     }
   });
 });
+
 //GET TRIBES BY CREATOR
 app.get('/tribe/creator/:creator',function(req,res){
   Tribes.getTribesByCreator(req.params.creator,function(err,tribes){
@@ -63,7 +67,13 @@ app.get('/tribe/creator/:creator',function(req,res){
     }
   });
 });
+
 //ADD TRIBE TO DATABASE.
+//{
+//  title: required
+//  description: required
+//  creator: required
+//}
 app.post('/tribe/add',function(req,res){
   //Grab all the info passed in through the post form.
   let post_date = req.body;
@@ -97,10 +107,11 @@ app.get('/user/:name',function(req,res){
     }
   });
 });
+
 //ADDS NEW USER TO THE DATABASE I.E SIGNUP
 app.post('/user/new',function(req,res){
   let post_date = req.body;
-
+  console.log(req.body);
   //CHECK IF THE NEW USER EMAIL ALREADY EXISTS WITHIN THE DATABASE.
   TribeUsers.checkUserEmail(req.body.email,function(err,resu){
     res.setHeader('Content-Type','application/json');
@@ -128,6 +139,43 @@ app.post('/user/new',function(req,res){
     }
   });
 });
+
+//LOGIN FUNCTIONS BEGIN HERE
+app.post('/user/login',function(req,res){
+  let post_data = req.body;
+
+  TribeUsers.checkNamePassword(req.body.username,req.body.password,function(err,resu){
+    res.setHeader('Content-Type','application/json');
+      if(err){
+        throw err;
+        res.end();
+      }else{
+        if(resu.length > 0){
+          res.json({type:"SUCCESS",message:"LOGIN SUCCESS",requested:req.body});
+        }else{
+          res.json({type:"ERROR",message:"LOGIN FAILED",requested:req.body});
+        }
+      }
+
+      res.end();
+  });
+});
+
+//ADD USER TO TRIBE
+//{
+//  user_id: required
+//  tribe_id: required
+//}
+app.post('/tribe/add/user',function(req,res){
+
+});
+
+//RETURNS ALL THE EVENTS ASSOCIATED WITH A GIVEN TRIBE.
+app.get('/events/:tribeId',function(req,res){
+  
+});
+
+//FUNCTIONS TO RETURN IDS BASED ON USERNAME OR TRIBE
 
 //Start the application on the given port.
 app.listen(4000);

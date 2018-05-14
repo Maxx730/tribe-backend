@@ -47,3 +47,10 @@ module.exports.checkUserEmail = function(email,callback){
 module.exports.addNewUser = function(user,callback){
   TribeUsers.create(user,callback);
 }
+
+module.exports.checkNamePassword = function(name,password,callback){
+  TribeUsers.find({username:name,password:password},callback);
+}
+
+
+
