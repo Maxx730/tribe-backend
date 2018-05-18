@@ -54,3 +54,7 @@ module.exports.checkUserInTribe = function(tribeId,userId,callback){
 module.exports.checkTribeUser = function(tribeName,creatorId,callback){
   Tribes.find({title:tribeName,creator:creatorId},callback);
 }
+
+module.exports.getUserTribes = function(userId,callback){
+  Tribes.find({members:{$in:[userId]}},callback);
+}

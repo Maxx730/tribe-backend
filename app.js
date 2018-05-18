@@ -212,6 +212,18 @@ app.post('/user/login',function(req,res){
   });
 });
 
+app.get('/user/tribes/:userId',function(req,res){
+  Tribes.getUserTribes(req.params.userId,function(err,tribes){
+    res.setHeader('Content-Type','application/json');
+    if(err){
+      throw err;
+    }else{
+      res.json(tribes);
+      res.end();
+    }
+  });
+});
+
 
 //RETURNS ALL THE EVENTS ASSOCIATED WITH A GIVEN TRIBE.
 app.get('/events/:tribeId',function(req,res){
