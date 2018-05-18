@@ -20,6 +20,26 @@ let app = express();
 app.use(body.urlencoded({extended:true}));
 app.use(body.json());
 
+
+app.use(function (req, res, next) {
+
+    // Website you wish to allow to connect
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    // Request methods you wish to allow
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+    // Request headers you wish to allow
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+
+    // Set to true if you need the website to include cookies in the requests sent
+    // to the API (e.g. in case you use sessions)
+    res.setHeader('Access-Control-Allow-Credentials', true);
+
+    // Pass to next layer of middleware
+    next();
+});
+
 //First two functions are very simple, they are going to simply just spit out all
 //of the users (for now) and tribes mostly for building purposes within our backend.
 
@@ -45,17 +65,6 @@ app.get('/tribes',function(req,res){
   });
 });
 
-//TRIBE FUNCTIONS HERE
-//GET TRIBE BY NAME
-app.get('/tribe/:name',function(req,res){
-  Tribes.getTribeByName(req.params.name,function(err,tribes){
-    if(err){
-      throw err;
-    }else{
-      res.json(tribes);
-    }
-  });
-});
 
 //GET TRIBES BY CREATOR
 app.get('/tribe/creator/:creator',function(req,res){
@@ -78,16 +87,27 @@ app.post('/tribe/add',function(req,res){
   //Grab all the info passed in through the post form.
   let post_date = req.body;
 
+  console.log(req.body);
+
   //First check if the database already has a tribe with the name
-  Tribes.getTribeByName(req.body.title,function(err,tribe){
+  Tribes.checkTribeUser(req.body.title,req.body.creator,function(err,tribes){
+    res.setHeader('Content-Type','application/json');
     if(err){
       throw err;
     }else{
-      //Check if tribe is not empty, if not then the tribe with the new title already exists.
-      if(tribe.length > 0){
-        console.log("we have found a tribe with said name.");
+      if(tribes.length == 0){
+        //Now add the tribe to the database.
+        Tribes.addTribe(req.body,function(err,tribe){
+          if(err){
+            throw err;
+          }else{
+            res.json({"SUCCESS":"TRIBE CREATED"});
+            res.end();
+          }
+        })
       }else{
-        console.log("we have NOT found a tribe with said name.");
+        res.json({error:{type:"TRIBE ALREADY CREATED"}});
+        res.end();
       }
     }
   });
@@ -95,6 +115,37 @@ app.post('/tribe/add',function(req,res){
   //pass it along to the mongo database schema object.
   //Tribes.addTribe(req.body);
 });
+
+//ADD USER TO TRIBE
+//{
+//  user_id: required
+//  tribe_id: required
+//}
+app.post('/tribe/add/user',function(req,res){
+  Tribes.checkUserInTribe(req.body.tribeId,req.body.userId,function(err,tribe){
+    res.setHeader('Content-Type','application/json');
+    if(err){
+      throw err;
+    }else{
+      if(tribe.length == 0){
+        Tribes.addUserToTribe(req.body.tribeId,req.body.userId,function(err,tribe){
+          if(err){
+            throw err;
+          }else{
+            res.json({"SUCCESS":"USER ADDED TO TRIBE"});
+            res.end();
+          }
+        });
+      }else{
+        res.json({"ERROR":{"type":"USER ALREADY IN TRIBE"}});
+        res.end();
+      }
+    }
+  });
+});
+
+
+
 
 //USER FUNCTIONS HERE
 //GET USER BY USERNAME
@@ -161,14 +212,6 @@ app.post('/user/login',function(req,res){
   });
 });
 
-//ADD USER TO TRIBE
-//{
-//  user_id: required
-//  tribe_id: required
-//}
-app.post('/tribe/add/user',function(req,res){
-
-});
 
 //RETURNS ALL THE EVENTS ASSOCIATED WITH A GIVEN TRIBE.
 app.get('/events/:tribeId',function(req,res){

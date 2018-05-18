@@ -10,7 +10,7 @@ let tribe_schema = mongoose.Schema({
     required:true
   },
   creator:{
-    type:String,
+    type:Number,
     required:true
   },
   events:{
@@ -44,5 +44,13 @@ module.exports.addTribe = function(data,callback){
 }
 
 module.exports.addUserToTribe = function(tribeId,userId,callback){
-  
+  Tribes.update({_id:tribeId},{$push:{members:userId}},callback)
+}
+
+module.exports.checkUserInTribe = function(tribeId,userId,callback){
+  Tribes.find({_id:tribeId,members:{$in:[userId]}},callback);
+}
+
+module.exports.checkTribeUser = function(tribeName,creatorId,callback){
+  Tribes.find({title:tribeName,creator:creatorId},callback);
 }
