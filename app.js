@@ -53,7 +53,10 @@ let UserSchema = new Schema({
   password: { type: String, required: true },
   firstname: String,
   lastname: String,
-  email: { type: String, required: true }
+  email: { type: String, required: true },
+  bio: { type: String, default: "" },
+  signup: {type: Date, default: Date.now },
+  profileImage: { type: String, default:"" },
 });
 
 //TRIBE SCHEMA
@@ -185,7 +188,7 @@ let Tribes = mongoose.model('Tribe', TribeSchema);
       
       Users.findOne({_id:req.params.id}).exec(function(err,user){
         if(!err && user != null){
-          res.json({username:user.username,firstname:user.firstname,lastname:user.lastname});
+          res.json({username:user.username,firstname:user.firstname,lastname:user.lastname,bio:user.bio});
           res.end();
         }else{
           res.end();
@@ -243,25 +246,36 @@ let Tribes = mongoose.model('Tribe', TribeSchema);
 
         //CHECK DATABASE FOR USERNAME AND PASSWORD, IF SUCCESS THEN SEND BACK A SUCCESS OBJECT.
         Users.findOne({username:req.body.username},(err,user) => {
-          if(err){
+          if(err || user == null){
             res.status(200);
-            res.json({"RESULT":{"TYPE":{"ERROR":{"MESSAGE":"INCORRECT USERNAME OR PASSWORD"}}}});
+            res.json({"PASSED":false,RESULT:{"TYPE":{"ERROR":{"MESSAGE":"INCORRECT USERNAME OR PASSWORD"}}}});
             res.end();
           }else{
             user.comparePassword(req.body.password,function(err,match){
               if(match == true && match){
                 res.status(200);
-                res.json({"RESULT":{"TYPE":{"SUCCESS":{"MESSAGE":"LOGIN PASSED"}}},"USER":{"ID":user._id}});
+                res.json({"PASSED":true,RESULT:{"TYPE":{"SUCCESS":{"MESSAGE":"LOGIN PASSED"}}},"USER":{"ID":user._id}});
                 res.end();
               }else{
                 res.status(200);
-                res.json({"RESULT":{"TYPE":{"ERROR":{"MESSAGE":"INCORRECT USERNAME OR PASSWORD"}}}});
+                res.json({"PASSED":true,"RESULT":{"TYPE":{"ERROR":{"MESSAGE":"INCORRECT USERNAME OR PASSWORD"}}}});
                 res.end();                
               }
             });
           }
         });
       }
+    });
+
+    app.post('/user/search',(req,res) => {
+      Users.find({username:{$regex:req.body.search}},(err,user) => {
+        if(!err && user != null){
+          res.json(user)
+          res.end();
+        }else{
+          res.end();
+        }
+      });
     });
 
     //
